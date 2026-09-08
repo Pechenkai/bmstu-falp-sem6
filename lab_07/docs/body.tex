@@ -1,0 +1,124 @@
+\chapter*{Практическая часть}
+
+\section*{Задание 1}
+Запустить среду Visual Prolog 5.2. Настроить утилиту TestGoal.
+Запустить тестовую программу, проанализировать реакцию системы и множество ответов.
+Разработать свою программу - «Телефонный справочник».
+Протестировать работу программы.
+
+При установке утилиты TestGoal добиться того, чтобы в результате выполнения
+тестовой программы возвращалось несколько вариантов ответов.
+
+\section*{Задание 2}
+Разработать свою программу - «Телефонный справочник и автомобили». Абоненты
+могут иметь несколько телефонов. Протестировать работу программы, используя разные вопросы.
+
+\begin{itemize}
+    \item «Телефонный справочник»: Фамилия, Номер, Адрес - структура (Город, Улица, Nºдома, N°кв)
+    \item «Автомобили»: Фамилия владельца, Марка, Цвет, Стоимость, Номер.
+\end{itemize}
+
+Владелец может иметь несколько телефонов, автомобилей (Факты). В разных городах есть однофамильцы, в одном городе - фамилия уникальна.
+Используя коньюнктивное правило и простой вопрос, обеспечить возможность
+поиска:
+
+По Марке и Цвету автомобиля найти Фамилию, Город, Телефон.
+
+На листинге~\ref{lst:brt} представлен код программы:
+%\FloatBarrier
+%\begin{lstinputlisting}[style={lsp}]{src/main2.pro}
+%\end{lstinputlisting}
+%\FloatBarrier
+
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:brt,caption=Код программы]
+domains
+    name = symbol.
+    city = symbol.
+    street = symbol.
+    car_brand = symbol.
+    color = symbol.
+    phone = string.
+    address = addressStruct(city, street, integer, integer).
+
+predicates
+    phone_number(name, address, phone).
+    car_info(name, car_brand, color, integer, symbol).
+
+    find_owner_by_car(car_brand, color, name, city, phone).
+
+clauses
+
+    phone_number(ivanov,
+        addressStruct(moscow, bauman, 10, 5),
+            "8-926-987-65-43").
+    phone_number(popov,
+        addressStruct(tula, pervomayskaya, 22, 15),
+            "8-903-555-22-11").
+    phone_number(ivanov,
+        addressStruct(volgograd, davidkovo, 3, 2),
+            "8-999-777-88-66").
+
+    car_info(ivanov, toyota, blue, 1000000, a123aa).
+    car_info(popov, bmw, black, 2000000, b456bb).
+    car_info(ivanov, lada, red, 500000, c789cc).
+
+    find_owner_by_car(Brand, Color, Name, City, Phone) :-
+        car_info(Name, Brand, Color, _, _),
+        phone_number(Name, addressStruct(City, _, _, _),
+                                                Phone).
+
+goal
+	find_owner_by_car(toyota, blue, Name, City, Phone).
+	%find_owner_by_car(tesla, white, Name, City, Phone).
+	%find_owner_by_car(lada, red, Name, City, Phone).
+	%car_info(Name, Brand, Color, _, _).
+    \end{lstlisting}
+\end{center}
+
+\chapter*{Тестирование}
+\begin{center}
+    \captionsetup{justification=raggedright,singlelinecheck=off}
+    \begin{lstlisting}[label=lst:brute_fRRRorce,caption=Тестирование]
+find_owner_by_car(toyota, blue, Name, City, Phone).
+Name=ivanov, City=moscow, Phone=8-926-987-65-43
+Name=ivanov, City=volgograd, Phone=8-999-777-88-66
+2 Solutions
+
+find_owner_by_car(tesla, white, Name, City, Phone).
+No Solution
+
+find_owner_by_car(bmw, black, Name, City, Phone).
+Name=popov, City=tula, Phone=8-903-555-22-11
+1 Solution
+    \end{lstlisting}
+\end{center}
+
+\chapter*{Теоретические вопросы}
+Основным элементом языка Prolog является терм: константа, переменная или составной терм.
+В некоторых случаях, можно сказать, что составной терм является предикатом.
+
+Программа на Prolog не является последовательностью действий, - она представляет
+собой набор фактов и правил, которые формируют базу знаний о предметной области.
+Факты представляют собой составные термы, с помощью которых фиксируется наличие
+истинностных отношений между объектами предметной области — аргументами терма.
+
+Утверждения программы — это предикаты. Предикаты могут не содержать переменных
+(основные) или содержать переменные (не основные). В процессе выполнения программы —
+система пытается найти, используя базу знаний , такие значения переменных, при которых на
+поставленный вопрос можно дать ответ «Да».
+
+Программа <<Телефонный справочник>> на Visual Prolog --- база знаний, которая хранит информацию о людях,
+их телефонных номерах, адресах и автомобилях, позволяет находить людей по характеристикам автомобиля (модель, цвет) и
+получить связанные с ним данные (фамилия, номер телефона, город) и вопрос, который воспринимается как цель, которую
+нужно достичь, используя знания из базы.
+
+Структура программы:
+\begin{itemize}
+    \item Домены. Домены определяют типы данных: car brand, color, street, city, name, phone, address;
+    \item Предикаты: phone number(name, address, phone) - хранит информацию о телефонах и адресах; car info(name, car brand, color, integer, symbol) - хранит данные об автомобилях;
+    find owner by car(Brand, Color, Name, City, Phone) - связывает автомобиль с городом и телефоном по фамилии
+    \item Факты. Список фактов для phone number и car info - хранятся конкретные записи;
+    \item Правила. find owner by car(Brand, Color, Name, City, Phone) - Объединяет данные из car info и phone number через общую переменную.
+\end{itemize}

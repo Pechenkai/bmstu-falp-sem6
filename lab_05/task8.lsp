@@ -1,0 +1,2 @@
+(print (reduce #' + ()))
+(print (reduce #' * ()))
